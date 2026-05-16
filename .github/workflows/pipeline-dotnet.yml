@@ -44,7 +44,7 @@ jobs:
           docker build -f Dockerfile -t ghcr.io/${{ steps.lowercase.outputs.repository }}:latest .
 
           # Subir la imagen construida a GHCR
-          docker push ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ steps.lowercase.outputs.repository }}:latest
 
   deploy:
     needs: build-and-push
