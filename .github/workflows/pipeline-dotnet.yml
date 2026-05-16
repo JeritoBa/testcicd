@@ -34,10 +34,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }} 
 
+      - name: Convert to Lowercase # Convertimos el repositorio actual en minusculas
+        id: lowercase
+        run: echo "repository=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         run: |
           # Construir la imagen Docker usando el Dockerfile
-          docker build -f Dockerfile -t ghcr.io/${{ github.repository }}:latest .
+          docker build -f Dockerfile -t ghcr.io/${{ steps.lowercase.outputs.repository }}:latest .
 
           # Subir la imagen construida a GHCR
           docker push ghcr.io/${{ github.repository }}:latest
