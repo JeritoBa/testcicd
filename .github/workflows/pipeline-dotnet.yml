@@ -51,6 +51,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - name: Convert to Lowercase # Convertimos el repositorio actual en minusculas
+        id: lowercase
+        run: echo "repository=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+        
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v0.1.9
         with:
@@ -62,10 +66,10 @@ jobs:
             echo "Conexión exitosa al VPS"
 
             docker login ghcr.io -u "jeritoba" -p ${{ secrets.TOKEN}} 
-            docker pull ghcr.io/${{ github.repository }}:latest
+            docker pull ghcr.io/${{ steps.lowercase.outputs.repository }}:latest
             docker stop ${{github.event.repository.name}} || true
             docker rm ${{github.event.repository.name}} || true
 
             docker run -d --name ${{ github.event.repository.name }} \
                          -p 8081:8080 \
-                         ghcr.io/${{ github.repository }}:latest
+                         ghcr.io/${{ steps.lowercase.outputs.repository }}:latest
